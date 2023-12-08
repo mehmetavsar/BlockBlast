@@ -6,14 +6,11 @@ using System.Threading.Tasks;
 
 namespace BlockBlast
 {
-    internal class Cell
+    internal class Cell(int row, int col)
     {
-        public Cell()
-        {
-            State = CellState.Empty;
-        }
-
-        public CellState State { get; set; }
+        public CellState State { get; set; } = CellState.Empty;
+        public int Row { get; } = row;
+        public int Col { get; } = col;
 
         public bool SetTrial()
         {

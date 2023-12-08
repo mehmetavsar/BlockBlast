@@ -1,23 +1,23 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Windows.Devices.Bluetooth.Advertisement;
 
 namespace BlockBlast
 {
-    internal class Grid
+    internal class Grid 
     {
-        public Grid(int rows, int cols)
+        public Grid(int rows, int cols) 
         {
             Rows = rows;
             Cols = cols;
 
-            data = new Cell[rows,cols];
-            for (int r =0; r < rows; r++)
+            Cells = [];
+            for (int r = 0; r < rows; r++)
                 for (int c = 0; c < cols; c++)
-                    data[r,c] = new Cell() { State = CellState.Empty};
+                    Cells.Add(new Cell(r, c) { State = CellState.Empty });
         }
 
         public void SetRow(int row, string cols)
@@ -33,30 +33,18 @@ namespace BlockBlast
             }
         }
 
-        Cell[,] data;
+        private readonly List<Cell> Cells;
 
-        public Cell this[int r, int c]
-        {
-            get => data[r,c];
-            set => data[r, c] = value;
-        }
+        public Cell this[int row, int col] => Cells.Where(c => c.Row == row && c.Col == col).FirstOrDefault();
 
         public int Rows { get; }
         public int Cols { get; }
 
-
-        List<Position> trials = [];
-        public void SetTrial(Position pos)
-        {
-            Cell cell = this[pos.Row, pos.Col];
-            if (cell.State == CellState.Empty)
-                cell.State = CellState.Trial;
-            else throw new Exception($"Cell {pos.Row},{pos.Col} is already {cell.State}");
-        }
-
         public void ClearTrials()
         {
-            trials = [];
+            foreach (Cell cell in Cells)
+                if (cell.State == CellState.Trial)
+                    cell.State = CellState.Empty;
         }
 
         public Match? Match(Grid piece, Position position)
@@ -131,7 +119,10 @@ namespace BlockBlast
 
             match.Score = blasted_count.Rows + blasted_count.Cols;
 
+            ClearTrials();
+
             return match;
         }
+
     }
 }
